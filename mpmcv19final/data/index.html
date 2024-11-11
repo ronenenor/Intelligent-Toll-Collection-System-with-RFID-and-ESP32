@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Toll Collection System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --success-color: #34C759;
+            --danger-color: #FF3B30;
+            --warning-color: #FF9500;
+            --background-color: #F5F5F7;
+            --card-background: #FFFFFF;
+            --text-color: #1D1D1F;
+            --secondary-text: #86868B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .hero {
+            background: var(--card-background);
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .balance-section {
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 17px;
+            color: var(--secondary-text);
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .card-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .info-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 15px;
+            color: var(--secondary-text);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .recharge-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .recharge-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #D2D2D7;
+            border-radius: 12px;
+            font-size: 17px;
+        }
+
+        .button {
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .button-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #0071EB;
+        }
+
+        .transactions {
+            margin-top: 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #D2D2D7;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .transaction-amount.debit {
+            color: var(--danger-color);
+        }
+
+        .transaction-amount.credit {
+            color: var(--success-color);
+        }
+
+        .transaction-amount.pending {
+            color: var(--warning-color);
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
+
+        .card-selector {
+            margin-bottom: 20px;
+        }
+
+        .card-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #D2D2D7;
+            border-radius: 12px;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .violations-panel {
+            background: #FFF3E0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .violations-panel.show {
+            display: block;
+        }
+
+        .blacklist-warning {
+            background: #FEE4E2;
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .blacklist-warning.show {
+            display: block;
+        }
+
+        .return-journey-badge {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .balance-amount {
+                font-size: 48px;
+            }
+
+            .card-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .recharge-form {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        let currentCardUID = '';
+        let eventSource;
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatDate(timestamp) {
+            return new Date(parseInt(timestamp)).toLocaleString();
+        }
+
+        function setupEventSource() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('/events');
+            
+            eventSource.addEventListener('transaction', function(e) {
+                const data = JSON.parse(e.data);
+                if (!currentCardUID || data.data.cardUID === currentCardUID) {
+                    loadCardInfo(currentCardUID);
+                    loadTransactions();
+                }
+            });
+
+            eventSource.addEventListener('cardUpdate', function(e) {
+                const data = JSON.parse(e.data);
+                if (!currentCardUID || data.cardUID === currentCardUID) {
+                    loadCardInfo(currentCardUID);
+                }
+            });
+
+            eventSource.addEventListener('violation', function(e) {
+                const data = JSON.parse(e.data);
+                if (!currentCardUID || data.cardUID === currentCardUID) {
+                    loadCardInfo(currentCardUID);
+                }
+            });
+
+            eventSource.addEventListener('blacklisted', function(e) {
+                const data = JSON.parse(e.data);
+                if (!currentCardUID || data.cardUID === currentCardUID) {
+                    loadCardInfo(currentCardUID);
+                    document.getElementById('blacklist-warning').classList.add('show');
+                }
+            });
+
+            eventSource.onerror = function(e) {
+                console.log('SSE Error:', e);
+                setTimeout(setupEventSource, 5000); // Reconnect after 5 seconds
+            };
+        }
+
+        async function loadCardInfo(uid) {
+            if (!uid) return;
+            try {
+                const response = await fetch(`/cardInfo?uid=${uid}`);
+                const data = await response.json();
+                document.getElementById('balance').textContent = formatCurrency(data.balance);
+                document.getElementById('violations').textContent = data.violations;
+                document.getElementById('pending-payment').textContent = formatCurrency(data.pendingPayment);
+    
+                // Update the warnings
+                const violationsPanel = document.getElementById('violations-panel');
+                const blacklistWarning = document.getElementById('blacklist-warning');
+                const lowBalanceWarning = document.getElementById('low-balance-warning');
+    
+                // Always show violations panel if there are pending payments
+                if (data.pendingPayment > 0) {
+                    violationsPanel.classList.add('show');
+                } else {
+                    violationsPanel.classList.remove('show');
+                }
+    
+                if (data.isBlacklisted) {
+                    blacklistWarning.classList.add('show');
+                    violationsPanel.classList.remove('show');
+                    // Update the warning text to show accumulated fine
+                    const warningText = blacklistWarning.querySelector('p');
+                    warningText.textContent = `This card has been blacklisted due to multiple violations. Current fine: ${formatCurrency(data.blacklistFine)}`;
+                } else {
+                    blacklistWarning.classList.remove('show');
+                }
+
+                // Show/hide low balance warning based on hasLowBalance flag
+                if (data.hasLowBalance && !data.isBlacklisted) {
+                    lowBalanceWarning.style.display = 'block';
+                } else {
+                    lowBalanceWarning.style.display = 'none';
+                }
+            
+                return data;
+            } catch (error) {
+                console.error('Error loading card info:', error);
+                return null;
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const response = await fetch('/transactions');
+                const transactions = await response.json();
+                const container = document.getElementById('transactions');
+                container.innerHTML = '';
+                
+                if (!transactions.length) {
+                    container.innerHTML = `
+                        <div class="transaction-item">
+                            <div class="transaction-info">No transactions yet</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                transactions.reverse().forEach(trans => {
+                    if (currentCardUID && trans.cardUID !== currentCardUID) return;
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item fade-in';
+                    const amountClass = trans.type === 'recharge' ? 'credit' : 
+                                    trans.type === 'pending' ? 'pending' : 'debit';
+                    const amountPrefix = trans.type === 'recharge' ? '+' : '-';
+                    
+                    const returnJourneyBadge = trans.isReturnJourney ? 
+                        '<span class="return-journey-badge">Return Journey (20% off)</span>' : '';
+                
+                    div.innerHTML = `
+                        <div class="transaction-info">
+                            <div class="transaction-amount ${amountClass}">
+                                ${amountPrefix}${formatCurrency(trans.amount)}
+                                ${returnJourneyBadge}
+                            </div>
+                            <div class="transaction-date">
+                                ${formatDate(trans.timestamp)}
+                            </div>
+                        </div>
+                        <div class="transaction-balance">
+                            Balance: ${formatCurrency(trans.balance)}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        async function rechargeCard() {
+            const amount = parseInt(document.getElementById('recharge-amount').value);
+            if (!currentCardUID || isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid card ID and amount');
+                return;
+            }
+
+            try {
+                const response = await fetch('/recharge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cardUID: currentCardUID,
+                        amount: amount
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('recharge-amount').value = '';
+                    await loadCardInfo(currentCardUID);
+                    await loadTransactions();
+                    alert(`Successfully recharged ${formatCurrency(amount)}`);
+                } else {
+                    alert('Error processing recharge');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing recharge');
+            }
+        }
+
+        async function unblacklistCard() {
+            if (!currentCardUID) {
+                alert('No card selected');
+                return;
+            }
+            const cardInfo = await loadCardInfo(currentCardUID);
+            const totalFine = cardInfo.blacklistFine;
+            
+            if (!confirm(`Pay accumulated fine of ${formatCurrency(totalFine)} to unblacklist this card?`)) {
+                return;
+            }
+            try {
+                const response = await fetch('/unblacklist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cardUID: currentCardUID
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Card has been unblacklisted. You can now use it again.');
+                    await loadCardInfo(currentCardUID);
+                    await loadTransactions();
+                } else {
+                    alert('Error unblacklisting card');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error unblacklisting card');
+            }
+        }
+
+        async function payPendingDues() {
+            if (!currentCardUID) {
+                alert('No card selected');
+                return;
+            }
+            const cardInfo = await loadCardInfo(currentCardUID);
+            if (!cardInfo || !cardInfo.pendingPayment) {
+                alert('No pending payments');
+                return;
+            }
+            if (!confirm(`Pay pending amount of ${formatCurrency(cardInfo.pendingPayment)}?`)) {
+                return;
+            }
+            try {
+                const response = await fetch('/recharge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cardUID: currentCardUID,
+                        amount: cardInfo.pendingPayment
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Successfully paid pending dues');
+                    await loadCardInfo(currentCardUID);
+                    await loadTransactions();
+                } else {
+                    alert('Error processing payment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing payment');
+            }
+        }
+
+        function updateCardUID() {
+            const newUID = document.getElementById('card-uid').value;
+            if (newUID !== currentCardUID) {
+                currentCardUID = newUID;
+                loadCardInfo(currentCardUID);
+                loadTransactions();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardInput = document.getElementById('card-uid');
+            cardInput.addEventListener('change', updateCardUID);
+            setupEventSource(); // Initialize SSE connection
+        });
+    </script>
+</head>
+<body>
+    <div class="hero">
+        <h1>Smart Toll Collection</h1>
+    </div>
+    
+    <div class="container">
+        <div class="card card-selector">
+            <h2>Enter Card ID</h2>
+            <input type="text" id="card-uid" class="card-input" placeholder="Enter your card ID">
+        </div>
+
+        <div class="card">
+            <div class="balance-section">
+                <div class="balance-label">Current Balance</div>
+                <div class="balance-amount" id="balance">₹0</div>
+                
+                <div class="card-info">
+                    <div class="info-item">
+                        <div class="info-label">Violations</div>
+                        <div class="info-value" id="violations">0</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Pending Payment</div>
+                        <div class="info-value" id="pending-payment">₹0</div>
+                    </div>
+                </div>
+
+                <div id="violations-panel" class="violations-panel">
+                    <h3>⚠️ Warning</h3>
+                    <p>You have pending violations. Please pay the pending amount to avoid blacklisting.</p>
+                    <button onclick="payPendingDues()" class="button button-primary" style="margin-top: 10px;">Pay Pending Dues</button>
+                </div>
+
+                <div id="blacklist-warning" class="blacklist-warning">
+                    <h3>🚫 Card Blacklisted</h3>
+                    <p>This card has been blacklisted due to multiple violations.</p>
+                    <button onclick="unblacklistCard()" class="button button-primary" style="margin-top: 10px;">Pay Fine & Unblacklist</button>
+                </div>
+
+                <div id="low-balance-warning" class="violations-panel" style="background: #FFF3E0; display: none;">
+                    <h3>⚠️ Low Balance Alert</h3>
+                    <p>Your balance is below the required amount for the next toll. Please recharge to avoid violations.</p>
+                </div>
+
+                <div class="recharge-form">
+                    <input type="number" id="recharge-amount" class="recharge-input" placeholder="Enter amount">
+                    <button onclick="rechargeCard()" class="button button-primary">Recharge</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Recent Transactions</h2>
+            <div id="transactions" class="transactions">
+                <div class="transaction-item">
+                    <div class="transaction-info">Loading transactions...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
