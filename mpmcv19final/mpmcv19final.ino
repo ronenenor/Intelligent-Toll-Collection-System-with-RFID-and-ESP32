@@ -9,8 +9,8 @@
 #include <time.h>
 
 // WiFi credentials
-const char* ssid = "Deco";
-const char* password = "Revival@2024";
+const char* ssid = "Your_WiFI_SSID";
+const char* password = "Your_WiFi_Password";
 
 #define RST_PIN         0          
 #define SS_PIN          5          
@@ -347,7 +347,7 @@ void loop() {
     CardData& card = getCardData(uid);
 
     if (card.isBlacklisted) {
-        // Initialize blacklistFine to 1000 if it's 0 (first time after blacklisting)
+        // Initialize blacklistFine to 1000
         if (card.blacklistFine == 0) {
             card.blacklistFine = 1000;
             card.lastTransactionTime = millis();
